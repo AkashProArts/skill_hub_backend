@@ -1,0 +1,22 @@
+{
+  "name": "skill_hub_backend",
+  "version": "1.0.0",
+  "description": "This is a learning platform where there will be mentors and learners",
+  "main": "index.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github-personal:AkashProArts/skill_hub_backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "nodemon": "^3.1.10"
+  }
+}
