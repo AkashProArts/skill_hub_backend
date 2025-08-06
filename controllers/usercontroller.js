@@ -16,7 +16,7 @@ userControllers.register = async (req, res) => {
     }
     var { fullName, email, role, password } = req.body;
 
-    if (!fullName || !email || !role || !password) {
+    if (!fullName || !ema. il || !role || !password) {
       return res.status(400).json({
         ok: false,
         error: "All fields are required",
@@ -49,9 +49,9 @@ userControllers.register = async (req, res) => {
   } catch (error) {
     console.error("Error in register: ", error.message);
 
-    return res.status(500).json({
+    return res.status(400).json({
       ok: false,
-      error: "Server error. Please try again later",
+      error: error.message,
     });
   }
 };
@@ -131,3 +131,4 @@ userControllers.profile = async (req, res) => {
 };
 
 module.exports = userControllers;
+  

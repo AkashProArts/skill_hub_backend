@@ -17,7 +17,6 @@ const lessonRoute = require("./routes/lesson-route")
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(errorHandler)
 
 
 
@@ -32,8 +31,7 @@ app.get("/", authenticate, (req, res) => {
 });
 
 
-/// Error handling middlewares 
-app.use(errorHandler)
+ app.use(errorHandler)
 
 
 

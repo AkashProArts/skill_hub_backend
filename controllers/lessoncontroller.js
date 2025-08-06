@@ -1,4 +1,5 @@
 const lessonControllers = {};
+const { model } = require("mongoose");
 const Lesson = require("../models/lesson.js");
 
 lessonControllers.create = async (req, res) => {
@@ -43,40 +44,76 @@ lessonControllers.getAllLessons = async (req, res) => {
     matchQuery.title = { $regex: search, $options: "i" };
   }
 
-  var lessons = await Lesson.find(matchQuery).select("-_id -__v -mentorId");
+  var lessons = await Lesson.find(matchQuery)
+    .select("-__v -mentorId")
+    .populate({ path: "mentorId", select: "fullName", model: "user" });
+  var formattedLessons = formatLessons(lessons).reverse();
 
-  return res.status(200).json({ ok: true, lessons: lessons });
+  return res.status(200).json({ ok: true, lessons: formattedLessons });
 };
 lessonControllers.getLessonsByMentorId = async (req, res) => {
   const { _id } = req.user;
 
   console.log("Id", _id);
-  var lessons = await Lesson.find({ mentorId: _id }).select(
-    "-_id -__v -mentorId"
-  );
+  var lessons = await Lesson.find({ mentorId: _id })
+    .select("-__v -mentorId")
+    .populate({ path: "mentorId", select: "fullName", model: "user" });
 
-  return res.status(200).json({ ok: true, lessons: lessons });
+  var formattedLessons = formatLessons(lessons).reverse();
+
+  return res.status(200).json({ ok: true, lessons: formattedLessons });
 };
-lessonControllers.getSingleLesson = async (req, res) => {
+lessonControllers.getLessonByLessonId = async (req, res) => {
   const { _id: userId } = req.user;
   const { lessonId } = req.params;
 
-  var lesson = await Lesson.findById(lessonId).select("-__v -_id").lean();
+  var lesson = await Lesson.findById(lessonId)
+    .select("-__v")
+    .populate({ path: "mentorId", select: "fullName", model: "user" })
+    .lean();
   // /.select(-__v -mentorId).lean();
 
   if (!lesson) {
     return res.status(404).json({ ok: false, message: "Invalid lesson Id" });
   }
-  console.log("Id", userId);
-  console.log("lessonId", lessonId);
+  // console.log("Id", userId);
+  // console.log("lessonId", lessonId);
 
   if (lesson.mentorId != userId) {
     await Lesson.updateOne({ _id: lessonId }, { $addToSet: { views: userId } });
   }
+  console.log("lesson", lesson);
 
-  const { mentorId, ...responseLesson } = lesson;
+  var formattedLesson = formatSingleLesson(lesson);
 
-  return res.status(200).json({ ok: true, lesson: responseLesson });
+  return res.status(200).json({ ok: true, lesson: formattedLesson });
 };
+
+function formatLessons(lessons) {
+  return lessons.map((lesson) => ({
+    id: lesson._id,
+
+    title: lesson.title,
+    lessonType: lesson.lessonType,
+    content: lesson.content,
+    mentor: {
+      fullName: lesson.mentorId.fullName,
+    },
+    views: lesson.views,
+  }));
+}
+function formatSingleLesson(lesson) {
+  return {
+    id: lesson._id,
+
+    title: lesson.title,
+    lessonType: lesson.lessonType,
+    content: lesson.content,
+    mentor: {
+      fullName: lesson.mentorId.fullName,
+    },
+    views: lesson.views,
+  };
+}
 
 module.exports = lessonControllers;

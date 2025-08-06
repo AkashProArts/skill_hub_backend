@@ -10,7 +10,7 @@ router.post("/create", isMentor, lessoncontroller.create);
 router.get("/", lessoncontroller.getAllLessons);
 router.get("/my", lessoncontroller.getLessonsByMentorId);
 
-router.get("/:lessonId", lessoncontroller.getSingleLesson);
+router.get("/:lessonId", lessoncontroller.getLessonByLessonId);
 
  
 module.exports = router;
