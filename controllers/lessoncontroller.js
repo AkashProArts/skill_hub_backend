@@ -37,7 +37,7 @@ lessonControllers.create = async (req, res) => {
 lessonControllers.getAllLessons = async (req, res) => {
   const search = req.query.search || "";
 
-  console.log("search", search);
+  // console.log("search", search);
   const matchQuery = {};
 
   if (search) {
@@ -105,7 +105,6 @@ function formatLessons(lessons) {
 function formatSingleLesson(lesson) {
   return {
     id: lesson._id,
-
     title: lesson.title,
     lessonType: lesson.lessonType,
     content: lesson.content,
@@ -113,6 +112,7 @@ function formatSingleLesson(lesson) {
       fullName: lesson.mentorId.fullName,
     },
     views: lesson.views,
+
   };
 }
 

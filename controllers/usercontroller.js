@@ -16,7 +16,7 @@ userControllers.register = async (req, res) => {
     }
     var { fullName, email, role, password } = req.body;
 
-    if (!fullName || !ema. il || !role || !password) {
+    if (!fullName || !email || !role || !password) {
       return res.status(400).json({
         ok: false,
         error: "All fields are required",
@@ -55,6 +55,7 @@ userControllers.register = async (req, res) => {
     });
   }
 };
+
 userControllers.login = async (req, res) => {
   console.log("login triggered");
 
@@ -130,5 +131,20 @@ userControllers.profile = async (req, res) => {
   return res.status(200).json({ ok: true, user });
 };
 
+userControllers.getMentors = async (req, res) => {
+  var search = req.query.search || "";
+
+  var matchQuery = {};
+
+  if (search) {
+    matchQuery.fullName = { $regex: search, $options: "i" };
+  }
+
+  var mentors = await User.find({ role: "MENTOR", ...matchQuery }).select(
+    "-__v -password"
+  );
+
+  return res.status(200).json({ ok: true, mentors });
+};
+
 module.exports = userControllers;
-  
