@@ -10,7 +10,7 @@ const lessonSchema = Schema(
     title: {
       type: String,
       required: true,
-      unique: true
+      unique: true,
     },
 
     lessonType: {
@@ -24,10 +24,31 @@ const lessonSchema = Schema(
     },
 
     views: [{ type: Schema.Types.ObjectId, ref: "user" }],
+    // Reviews List
+    reviews: [
+      {
+        userId: { type: Schema.Types.ObjectId, ref: "user", required: true },
+        comment: { type: String, required: true },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    // Ratings list
+    ratings: [
+      {
+        userId: { type: Schema.Types.ObjectId, ref: "user", required: true },
+        value: { type: Number, required: true, min: 1, max: 5 },
+        createdAt: { type: Date, default: Date.now },
+      },
+    ],
+    // Ratings summary
+    ratingsSummary: {
+      average: { type: Number, default: 0 },
+      count: { type: Number, default: 0 },
+    },
   },
   { timeStamps: true }
 );
 
-const lesson =  model("lesson", lessonSchema);
+const Lesson = model("lesson", lessonSchema);
 
-module.exports = lesson;
+module.exports = Lesson;

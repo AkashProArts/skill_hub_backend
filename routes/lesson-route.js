@@ -1,17 +1,20 @@
 const express = require("express");
-const lessoncontroller = require("../controllers/lessoncontroller");
-const { isMentor } = require("../middleware/auth-middleware");
+ const { isMentor } = require("../middleware/auth-middleware");
 const lessonControllers = require("../controllers/lessoncontroller");
-
+ 
 const router = express.Router();
 
-router.post("/create", isMentor, lessoncontroller.create);
+router.post("/create", isMentor, lessonControllers.create);
 
-router.get("/", lessoncontroller.getAllLessons);
-router.get("/my", lessoncontroller.getLessonsByMentorId);
+router.get("/", lessonControllers.getAllLessons);
+router.get("/my", lessonControllers.getLessonsByMentorId);
+router.get("/popular", lessonControllers.popularLessons);
 
-router.get("/:lessonId", lessoncontroller.getLessonByLessonId);
+router.post('/review', lessonControllers.addOrUpdateReview);
+router.post('/rating', lessonControllers.addOrUpdateRating);
 
- 
+router.get("/review/:lessonId", lessonControllers.getReviews);
+ router.get("/:lessonId", lessonControllers.getLessonByLessonId);
+
 module.exports = router;
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 

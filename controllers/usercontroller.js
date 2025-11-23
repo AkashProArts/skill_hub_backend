@@ -147,4 +147,129 @@ userControllers.getMentors = async (req, res) => {
   return res.status(200).json({ ok: true, mentors });
 };
 
+userControllers.addOrUpdateReview = async (req, res) => {
+  if (!req.body) {
+    return res
+      .status(400)
+      .json({ ok: false, error: "The request Body is missing" });
+  }
+  // console.log("addOrUpdateReview triggered");
+
+  var { mentorId, comment } = req.body;
+  // console.log(req.body);
+
+  var ratingUserId = req.user._id;
+  // console.log(ratingUserId);
+  var ratedUser = await User.findById(mentorId);
+
+  //  console.log("ratedUser : ", ratedUser);
+
+  if (!ratedUser) throw Error("User not found");
+
+  const existingReview = ratedUser.reviews.find(
+    (rev) => rev.userId.toString() === ratingUserId.toString()
+  );
+  // console.log("existingReview : ", existingReview);
+  if (existingReview) {
+    existingReview.comment = comment;
+    existingReview.createdAt = Date.now();
+  } else {
+    // console.log("else triggered");
+
+    // console.log(ratedUser.reviews);
+
+    ratedUser.reviews.push({
+      userId: ratingUserId,
+      comment,
+    });
+  }
+
+  await ratedUser.save();
+  res.status(200).json({ ok: true, message: "Review added successfully" });
+};
+userControllers.addOrUpdateRating = async (req, res) => {
+  if (!req.body) {
+    return res
+      .status(400)
+      .json({ ok: false, error: "The request Body is missing" });
+  }
+
+  var { mentorId, value } = req.body;
+  console.log(req.body);
+
+  var ratingUserId = req.user._id;
+
+  var ratedUser = await User.findById(mentorId);
+
+  console.log("ratedUser : ", ratedUser);
+  // console.log("lessonDoc : ", lessonDoc);
+
+  if (!ratedUser) {
+    res.status(404).json({ ok: false, message: "User not found" });
+  }
+
+  const existingRating = ratedUser.ratings.find(
+    (rat) => rat.userId.toString() === ratingUserId.toString()
+  );
+  // console.log("existingRating : ", existingRating);
+  if (existingRating) {
+    existingRating.value = value;
+    existingRating.createdAt = Date.now();
+  } else {
+    ratedUser.ratings.push({
+      userId: ratingUserId,
+      value,
+    });
+  }
+
+  if (ratedUser.ratings.length > 0) {
+    const total = ratedUser.ratings.reduce((acc, curr) => acc + curr.value, 0);
+    ratedUser.ratingsSummary.count = ratedUser.ratings.length;
+    ratedUser.ratingsSummary.average = total / ratedUser.ratings.length;
+  }
+
+  await ratedUser.save();
+  return res
+    .status(200)
+    .json({ ok: true, message: "Rating updated successfully" });
+};
+userControllers.getReviews = async (req, res) => {
+  // console.log("get reviews triggered");
+
+  var { userId } = req.params;
+  // console.log(lessonId);
+
+  var user = await User.findById(userId).populate({
+    path: "reviews.userId",
+    select: "fullName",
+    model: "user",
+  });
+
+  // console.log("lessonDoc : ", lessonDoc);
+
+  if (!user) {
+    res.status(404).json({ ok: false, message: "User not found" });
+  }
+
+  res.status(200).json({
+    ok: true,
+    reviews: user.reviews,
+  });
+};
+
+userControllers.getPopularMentors = async (req, res) => {
+  var userId = req.user._id;
+  const mentors = await User.find({
+    "ratingsSummary.count": { $gt: 0 },
+    _id: { $ne: userId },
+  })
+    .sort({
+      "ratingsSummary.average": -1,
+    })
+    .select("-__v -password")
+    .lean();
+
+  return res.json({ ok: true, mentors });
+};
+
 module.exports = userControllers;
