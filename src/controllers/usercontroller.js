@@ -147,6 +147,21 @@ userControllers.getMentors = async (req, res) => {
   return res.status(200).json({ ok: true, mentors });
 };
 
+userControllers.getAllUsers = async (req, res) => {
+  var search = req.query.search || "";
+
+  var matchQuery = {};
+
+  if (search) {
+    matchQuery.fullName = { $regex: search, $options: "i" };
+  }
+
+  var users = await User.find({ ...matchQuery }).select(
+    "-__v -password"
+  );
+
+  return res.status(200).json({ ok: true, users });
+};
 userControllers.addOrUpdateReview = async (req, res) => {
   if (!req.body) {
     return res

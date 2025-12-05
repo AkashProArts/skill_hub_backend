@@ -7,6 +7,7 @@ router.post("/register", userControllers.register);
 router.post("/login", userControllers.login);
 router.get("/profile", authenticate, userControllers.profile);
 router.get("/mentors", authenticate, userControllers.getMentors);
+router.get("/all-users", authenticate, userControllers.getAllUsers);
 router.get("/mentors/popular", authenticate, userControllers.getPopularMentors);
 
 router.post("/review", authenticate, userControllers.addOrUpdateReview);

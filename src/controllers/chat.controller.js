@@ -4,8 +4,8 @@ const e = require("express");
 const Chat = require("../models/chat.model");
 
 chatControllers.getChatDetails = async (req, res) => {
-    console.log("createIndividualChat triggered");
-    
+  console.log("createIndividualChat triggered");
+
   try {
     if (!req.body) {
       return res
@@ -23,13 +23,13 @@ chatControllers.getChatDetails = async (req, res) => {
       isGroup: false,
       participants: { $all: [user1, user2], $size: 2 },
     })
-      .populate("participants", "fullName email")
+      .select("-__v")
       .lean();
 
-      if (existingChat) {
-        console.log("existing chat : ", existingChat);
-        
-      return res.status(200).json({ ok: true, chat: existingChat });
+    if (existingChat) {
+      // console.log("existing chat : ", existingChat);
+
+      return res.status(200).json({ ok: true, chatId: existingChat._id, isGroup: existingChat.isGroup });
     }
 
     var newChat = await Chat.create({
