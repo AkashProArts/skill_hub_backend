@@ -1,4 +1,4 @@
-const { Schema } = require("mongoose");
+const { Schema, model } = require("mongoose");
 
 
 const messageSchema = Schema({
@@ -9,7 +9,7 @@ const messageSchema = Schema({
 
   senderId: {
     type: Schema.Types.ObjectId,
-    ref:"user"
+    ref: "user"
   },
 
   text: {
@@ -17,11 +17,18 @@ const messageSchema = Schema({
     required: true
   }
   ,
-  
+
   status: {
     type: String,
-    enum:["Sent", "Delivered", "Seen"]
+    enum: ["Sent", "Delivered", "Seen"],
+    default: "Sent"
   }
 
 
-}, {timeStamps: true});
+}, { timestamps: true });
+
+
+
+const message = model("message", messageSchema);
+
+module.exports = message;

@@ -12,7 +12,7 @@ const chatSchema = Schema(
     name: { type: String },
     lastMessage: { type: Schema.Types.ObjectId, ref: "message" },
   },
-  { timeStamps: true }
+  { timestamps: true }
 );
 
 const chat = model("chat", chatSchema);

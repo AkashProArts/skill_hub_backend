@@ -99,19 +99,25 @@ userControllers.login = async (req, res) => {
       return res.status(400).json({ ok: false, error: "Invalid credentials" });
     }
     var { _id, role } = user;
-
+ 
     var token = await jwt.sign(
       {
         _id,
         role,
+         
       },
       process.env.JWT_SECRET_KEY
     );
 
     return res.json({
       ok: true,
-      token: token,
-      role,
+    
+      user: {
+        "id": user._id,
+        token,
+        role
+
+      }
     });
   } catch (error) {
     console.error("Error in login: ", error.message);
@@ -126,7 +132,7 @@ userControllers.login = async (req, res) => {
 userControllers.profile = async (req, res) => {
   const { _id } = req.user;
 
-  var user = await User.findById(_id).select("-_id -__v -password");
+  var user = await User.findById(_id).select("-__v -password");
 
   return res.status(200).json({ ok: true, user });
 };
