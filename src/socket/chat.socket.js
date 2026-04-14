@@ -3,7 +3,7 @@ const chat = require("../models/chat.model");
 const { raw } = require("express");
 
 function chatSocket(io) {
-
+  const userSocketMap = new Map();
 
 
   io.on("connection", (socket) => {
@@ -13,6 +13,13 @@ function chatSocket(io) {
       socket.join(chatId);
       console.log("User joined chat: ", chatId);
     });
+
+    socket.on("register", (userId => {
+
+
+      userSocketMap.set(userId, socket.id);
+      
+    }))
 
     socket.on("sendMessage", async (data) => {
       try {
@@ -50,7 +57,22 @@ function chatSocket(io) {
         console.log("messageResult: ", messageResult);
 
         // Emit to all users in the chat room
-        io.to(chatId).emit("newMessage", messageResult);
+        // io.to(chatId).emit("newMessage", messageResult);
+
+        const chatDoc = await chat.findById(chatId);
+
+        if (chatDoc) {
+          
+          chatDoc.participants.forEach((participantId) => {
+
+            const socketId = userSocketMap.get(participantId.toString());
+            if (socketId) {
+              
+              io.to(socketId).emit("newMessage", messageResult)
+            }
+            
+          });
+        }
 
         // Send delivery confirmation to sender
         socket.emit("messageDelivered", { messageId: messageResult._id });
@@ -109,6 +131,17 @@ function chatSocket(io) {
     });
 
     socket.on("disconnect", () => {
+
+      for (const [userId, socketId] of userSocketMap.entries()) {
+        
+        if (socketId === socket.id) {
+          
+          userSocketMap.delete(userId);
+          break;
+        }
+      }
+
+
       console.log("user disconnected")
     });
   });

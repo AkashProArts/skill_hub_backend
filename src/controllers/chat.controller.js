@@ -36,13 +36,16 @@ chatControllers.getChatDetails = async (req, res) => {
       participants: [user1, user2],
       isGroup: false,
     });
+console.log('newChat: ', newChat);
 
-    var populateChat = await Chat.findById(newChat._id).populate(
-      "participants",
-      "fullName email"
-    );
-
-    return res.status(200).json({ ok: true, chat: populateChat });
+ 
+    return res
+      .status(200)
+      .json({
+        ok: true,
+        chatId: newChat._id,
+        isGroup: newChat.isGroup,
+      });
   } catch (error) {
     console.log("error", error);
 
@@ -52,8 +55,7 @@ chatControllers.getChatDetails = async (req, res) => {
 
 // Get all chats for the authenticated user
 chatControllers.getUserChats = async (req, res) => {
-  console.log("getUserChats triggered");
-
+ 
   try {
     const userId = req.user?._id || req.query.userId;
 
@@ -87,7 +89,6 @@ chatControllers.getUserChats = async (req, res) => {
 
 // Get messages for a specific chat with pagination
 chatControllers.getChatMessages = async (req, res) => {
-  console.log("getChatMessages triggered");
 
   try {
     const { chatId } = req.params;
