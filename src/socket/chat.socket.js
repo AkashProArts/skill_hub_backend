@@ -74,12 +74,7 @@ function chatSocket(io) {
           });
         }
 
-        // // Send delivery confirmation to sender
-        // socket.emit("messageDelivered", { messageId: messageResult._id });
-
-        // Update status to Delivered for other participants
-        // Wait a bit for other clients to receive, then update
-        // setTimeout(async () => {
+        
           try {
             await message.findByIdAndUpdate(messageResult._id, { status: "Delivered" });
             // Emit updated status to all participants
@@ -90,8 +85,7 @@ function chatSocket(io) {
           } catch (err) {
             console.error("Error updating message to Delivered:", err);
           }
-        // }
-        // , 500);
+        
 
       } catch (err) {
 
